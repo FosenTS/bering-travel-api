@@ -96,16 +96,18 @@ func NewApp(ctx context.Context, logEntry *log.Entry, ginLogger gin.HandlerFunc)
 
 func (app *app) Run(ctx context.Context) error {
 
-	grp, ctx := errgroup.WithContext(ctx)
+	fmt.Println("AA")
 
+	grp, ctx := errgroup.WithContext(ctx)
 	grp.Go(func() error {
 		return app.runHTTP()
 	})
 
-	return nil
+	return grp.Wait()
 }
 
 func (app *app) runHTTP() error {
+	log.Infoln("Start HTTP")
 	r := gin.New()
 	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: os.Stdout}), gin.Recovery())
 

@@ -2,6 +2,8 @@ create table pointer(
     id bigint generated always as identity primary key,
     name text not null,
     address text not null,
+    latitude float not null,
+    longitude float not null,
     rating int not null
 );
 
