@@ -98,9 +98,7 @@ func (m *mappperService) GetPlaces(ctx context.Context) ([]*entity.Places, error
 	places := make([]*entity.Places, 0)
 
 	for _, p := range pointers {
-		id := oid.ToID(string(p.Id))
-
-		commentaties, err := m.mapperStorage.GetCommentsByPlace(ctx, id)
+		commentaties, err := m.mapperStorage.GetCommentsByPlace(ctx, p.Id)
 		if err != nil {
 			return nil, err
 		}

@@ -178,7 +178,7 @@ func (m *mapperRepository) UpdateCoins(ctx context.Context, id oid.ID, count int
 	return nil
 }
 
-func (m *mapperRepository) GetCommentsByPlace(ctx context.Context, point_id oid.ID) ([]*entity.Commit, error) {
+func (m *mapperRepository) GetCommentsByPlace(ctx context.Context, point_id uint) ([]*entity.Commit, error) {
 	rows, err := m.pool.Query(
 		ctx,
 		"Select user_id, comment FROM user_visit WHERE pointer_id=$1",
