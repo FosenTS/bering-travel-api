@@ -5,8 +5,8 @@ import (
 	"bering-travel-api/internal/domain/storage/dto"
 	"context"
 	"fmt"
-	"github.com/FosenTS/pkg/object/oid"
 	"github.com/Masterminds/squirrel"
+	"github.com/achillescres/pkg/object/oid"
 )
 
 type Storage[Entity entity.Entity, Create dto.Create] interface {

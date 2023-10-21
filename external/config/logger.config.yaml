@@ -1,0 +1,4 @@
+infoLogPath: "/logs/saina.info.log"
+errorLogPath: "/logs/saina.error.log"
+traceLogPath: "/logs/saina.trace.log"
+fatalLogPath: "/logs/saina.fatal.log"

@@ -2,7 +2,7 @@ package repository
 
 import (
 	"bering-travel-api/internal/domain/storage"
-	"github.com/FosenTS/pkg/db/postgresql"
+	"github.com/achillescres/pkg/db/postgresql"
 )
 
 type MapperRepository storage.MapperStorage

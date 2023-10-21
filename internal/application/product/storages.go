@@ -3,7 +3,7 @@ package product
 import (
 	"bering-travel-api/internal/domain/storage"
 	"bering-travel-api/internal/infrastructure/repository"
-	"github.com/FosenTS/pkg/db/postgresql"
+	"github.com/achillescres/pkg/db/postgresql"
 )
 
 type Storages struct {

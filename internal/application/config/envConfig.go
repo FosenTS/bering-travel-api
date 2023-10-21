@@ -31,23 +31,6 @@ type EnvConfig struct {
 	PostgresUseCA        bool   `env:"POSTGRES_USE_CA" env-required:"true"`
 	PostgresCaPath       string `env:"POSTGRES_CA_PATH" env_required:"true"`
 
-	// FTP tais output
-	FTPTaisOutputHost     string `env:"FTP_TAIS_OUTPUT_HOST" env_required:"true"`
-	FTPTaisOutputPort     uint   `env:"FTP_TAIS_OUTPUT_PORT" env-required:"true"`
-	FTPTaisOutputUsername string `env:"FTP_TAIS_OUTPUT_USERNAME" env_required:"true"`
-	FTPTaisOutputPassword string `env:"FTP_TAIS_OUTPUT_PASSWORD" env_required:"true"`
-
-	// Artem forecast
-	ArtemForecastContainerURL string `env:"ARTEM_FORECAST_CONTAINER_URL" env-required:"true"`
-
-	//External API
-	//reports
-	ReportsContainerURL string `env:"REPORTS_CONTAINER_URL" env-required:"true"`
-
-	// Secrets
-	PasswordHashSalt string `env:"PASSWORD_HASH_SALT" env-required:"true"`
-	JWTSecret        string `env:"JWT_SECRET" env-required:"true"`
-
 	ConfigAbsPath string
 }
 

@@ -5,7 +5,7 @@ import (
 	"bering-travel-api/internal/application/product"
 	"context"
 	"fmt"
-	"github.com/FosenTS/pkg/db/postgresql"
+	"github.com/achillescres/pkg/db/postgresql"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
