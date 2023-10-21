@@ -4,7 +4,8 @@ create table pointer(
     description text not null,
     latitude float not null,
     longitude float not null,
-    rating int not null
+    rating int not null,
+    time timestamp not null
 );
 
 create table user_visit(
@@ -13,6 +14,7 @@ create table user_visit(
     pointer_id BIGINT REFERENCES pointer(id) not null,
     rating int not null,
     comment text not null,
+    time timestamp not null,
     user_activity bool not null
 );
 

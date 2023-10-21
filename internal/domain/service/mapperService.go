@@ -6,6 +6,7 @@ import (
 	"bering-travel-api/internal/infrastructure/controller/safeObject"
 	"context"
 	"github.com/achillescres/pkg/object/oid"
+	"sort"
 )
 
 type MapperService interface {
@@ -13,7 +14,7 @@ type MapperService interface {
 	GetAllPointes(ctx context.Context) ([]*entity.Pointer, error)
 	StoreUserVisit(ctx context.Context, visit *safeObject.UserVisit) error
 	GetUserVisitsById(ctx context.Context, id oid.ID) ([]*entity.UserVisit, error)
-	GetPlaces(ctx context.Context) ([]*entity.Places, error)
+	GetPlaces(ctx context.Context, sortType string) ([]*entity.Places, error)
 	GetUserProfile(ctx context.Context, id oid.ID) (*entity.Profile, error)
 }
 
@@ -37,6 +38,22 @@ func (m *mappperService) GetAllPointes(ctx context.Context) ([]*entity.Pointer, 
 	pointers, err := m.mapperStorage.GetAllPointers(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	for i, p := range pointers {
+		ratings, err := m.mapperStorage.GetAllRatingUsers(ctx, p.Id)
+		if err != nil {
+			return nil, err
+		}
+		if ratings == nil {
+			continue
+		}
+		var total uint
+		ratings = append(ratings, p.Rating)
+		for _, number := range ratings {
+			total = total + number
+		}
+		pointers[i].Rating = uint(int(total) / len(ratings))
 	}
 
 	return pointers, nil
@@ -89,10 +106,26 @@ func (m *mappperService) GetUserProfile(ctx context.Context, id oid.ID) (*entity
 	}, err
 }
 
-func (m *mappperService) GetPlaces(ctx context.Context) ([]*entity.Places, error) {
+func (m *mappperService) GetPlaces(ctx context.Context, sortType string) ([]*entity.Places, error) {
 	pointers, err := m.mapperStorage.GetAllPointers(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	for i, p := range pointers {
+		ratings, err := m.mapperStorage.GetAllRatingUsers(ctx, p.Id)
+		if err != nil {
+			return nil, err
+		}
+		if ratings == nil {
+			continue
+		}
+		var total uint
+		ratings = append(ratings, p.Rating)
+		for _, number := range ratings {
+			total = total + number
+		}
+		pointers[i].Rating = uint(int(total) / len(ratings))
 	}
 
 	places := make([]*entity.Places, 0)
@@ -103,6 +136,10 @@ func (m *mappperService) GetPlaces(ctx context.Context) ([]*entity.Places, error
 			return nil, err
 		}
 
+		sort.Slice(commentaties, func(i, j int) bool {
+			return commentaties[i].Time.Before(commentaties[j].Time)
+		})
+
 		places = append(
 			places,
 			&entity.Places{
@@ -112,9 +149,26 @@ func (m *mappperService) GetPlaces(ctx context.Context) ([]*entity.Places, error
 				Rating:      p.Rating,
 				Latitude:    p.Latitude,
 				Longitude:   p.Longitude,
+				Time:        p.Time,
 				Comments:    commentaties,
 			},
 		)
+
+		switch sortType {
+		case "rating":
+			sort.Slice(places, func(i, j int) bool {
+				return places[i].Rating > places[j].Rating
+			})
+		case "comments":
+			sort.Slice(places, func(i, j int) bool {
+				return len(places[i].Comments) > len(places[j].Comments)
+			})
+		case "time":
+			sort.Slice(places, func(i, j int) bool {
+				return places[j].Time.Before(places[i].Time)
+			})
+		}
+
 	}
 	return places, nil
 }

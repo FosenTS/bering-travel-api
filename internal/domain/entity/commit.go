@@ -1,10 +1,9 @@
 package entity
 
-type Commit struct {
-	UserID uint   `json:"userId" db:"user_id" binding:"required"`
-	Commit string `json:"comment" db:"comment" binding:"required"`
-}
+import "time"
 
-func NewCommit(userID uint, commit string) *Commit {
-	return &Commit{UserID: userID, Commit: commit}
+type Commit struct {
+	UserID uint      `json:"userId" db:"user_id" binding:"required"`
+	Commit string    `json:"comment" db:"comment" binding:"required"`
+	Time   time.Time `json:"time" db:"time" binding:"required"`
 }

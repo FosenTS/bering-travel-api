@@ -102,7 +102,16 @@ func (h *Handler) getUserVisits(c *gin.Context) {
 }
 
 func (h *Handler) getPlaces(c *gin.Context) {
-	places, err := h.mapperService.GetPlaces(c)
+
+	sortType, ok := c.GetQuery("sort")
+	if !ok {
+		err := errors.New("empty sort query")
+		log.Errorln(err)
+		ginresponse.ErrorString(c, http.StatusUnprocessableEntity, err, "empty sort query")
+		return
+	}
+
+	places, err := h.mapperService.GetPlaces(c, sortType)
 	if err != nil {
 		log.Errorln(err)
 		ginresponse.ErrorString(c, http.StatusInternalServerError, err, "unkown error")

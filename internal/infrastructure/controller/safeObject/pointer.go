@@ -6,4 +6,5 @@ type Pointer struct {
 	Rating      uint    `json:"rating" db:"rating" binding:"required"`
 	Latitude    float64 `json:"latitude" db:"latitude" binding:"required"`
 	Longitude   float64 `json:"longitude" db:"longitude" binding:"required"`
+	Time        string  `json:"time" db:"time" binding:"required"`
 }
