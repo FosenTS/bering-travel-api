@@ -9,8 +9,8 @@ create table pointer(
 
 create table user_visit(
     id bigint generated always as identity primary key,
-    user_id BIGINT REFERENCES pointer(id) not null,
-    pointer_id int not null,
+    user_id BIGINT not null,
+    pointer_id BIGINT REFERENCES pointer(id) not null,
     rating int not null,
     comment text
 );
