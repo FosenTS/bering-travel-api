@@ -24,6 +24,7 @@ func (h *Handler) RegisterRouter(r *gin.RouterGroup) {
 	r.GET("getPointers", h.getPointers)
 	r.POST("addUserVisit", h.addUserVisit)
 	r.GET("getUserVisits", h.getUserVisits)
+	r.GET("getPlaces", h.getPlaces)
 }
 
 func (h *Handler) addPointer(c *gin.Context) {
@@ -98,4 +99,15 @@ func (h *Handler) getUserVisits(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, visits)
+}
+
+func (h *Handler) getPlaces(c *gin.Context) {
+	places, err := h.mapperService.GetPlaces(c)
+	if err != nil {
+		log.Errorln(err)
+		ginresponse.ErrorString(c, http.StatusInternalServerError, err, "unkown error")
+		return
+	}
+
+	c.JSON(http.StatusOK, places)
 }

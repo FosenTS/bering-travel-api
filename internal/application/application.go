@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/achillescres/pkg/db/postgresql"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
@@ -107,9 +108,17 @@ func (app *app) Run(ctx context.Context) error {
 }
 
 func (app *app) runHTTP() error {
+
+	corsConfig := cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		AllowCredentials: true,
+	}
+
 	log.Infoln("Start HTTP")
 	r := gin.New()
-	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: os.Stdout}), gin.Recovery())
+	r.Use(cors.New(corsConfig), gin.LoggerWithConfig(gin.LoggerConfig{Output: os.Stdout}), gin.Recovery())
 
 	err := app.endpoint.RegisterHandlersToGroup(r)
 	if err != nil {

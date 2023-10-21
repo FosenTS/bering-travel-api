@@ -7,4 +7,5 @@ type UserVisit struct {
 	Rating    uint    `json:"rating" db:"rating" binding:"required"`
 	Comment   string  `json:"comment" db:"comment" binding:"required"`
 	Pointer   Pointer `json:"pointer" db:"pointer" binding:"required"`
+	Activity  bool    `db:"activity" binding:"required"`
 }

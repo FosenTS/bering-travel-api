@@ -13,4 +13,5 @@ type MapperStorage interface {
 	GetPointerById(ctx context.Context, id uint) (*entity.Pointer, error)
 	StoreUserVisit(ctx context.Context, visit *safeObject.UserVisit) error
 	GetUserVisitById(ctx context.Context, id oid.ID) ([]*entity.UserVisit, error)
+	GetCommentsByPlace(ctx context.Context, point_id oid.ID) ([]*entity.Commit, error)
 }

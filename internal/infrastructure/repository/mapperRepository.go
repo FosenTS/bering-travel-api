@@ -25,9 +25,9 @@ func NewMapperRepository(pool postgresql.PGXPool) MapperRepository {
 func (m *mapperRepository) StorePointer(ctx context.Context, pointer *safeObject.Pointer) error {
 	_, err := m.pool.Exec(
 		ctx,
-		"INSERT INTO pointer (name, address, latitude, longitude, rating) VALUES ($1, $2, $3, $4, $5)",
+		"INSERT INTO pointer (name, description, latitude, longitude, rating) VALUES ($1, $2, $3, $4, $5)",
 		pointer.Name,
-		pointer.Address,
+		pointer.Description,
 		pointer.Latitude,
 		pointer.Longitude,
 		pointer.Rating,
@@ -41,7 +41,7 @@ func (m *mapperRepository) StorePointer(ctx context.Context, pointer *safeObject
 func (m *mapperRepository) GetAllPointers(ctx context.Context) ([]*entity.Pointer, error) {
 	rows, err := m.pool.Query(
 		ctx,
-		"SELECT id, name, address, latitude, longitude, rating FROM pointer",
+		"SELECT id, name, description, latitude, longitude, rating FROM pointer",
 	)
 	if err != nil {
 		return nil, err
@@ -64,12 +64,12 @@ func (m *mapperRepository) GetPointerById(ctx context.Context, id uint) (*entity
 	var pointer entity.Pointer
 	err := m.pool.QueryRow(
 		ctx,
-		"SELECT id, name, address, latitude, longitude, rating FROM pointer WHERE id = $1",
+		"SELECT id, name, description, latitude, longitude, rating FROM pointer WHERE id = $1",
 		id,
 	).Scan(
 		&pointer.Id,
 		&pointer.Name,
-		&pointer.Address,
+		&pointer.Description,
 		&pointer.Latitude,
 		&pointer.Longitude,
 		&pointer.Rating,
@@ -84,11 +84,12 @@ func (m *mapperRepository) GetPointerById(ctx context.Context, id uint) (*entity
 func (m *mapperRepository) StoreUserVisit(ctx context.Context, visit *safeObject.UserVisit) error {
 	_, err := m.pool.Exec(
 		ctx,
-		"INSERT INTO user_visit (user_id, pointer_id, rating, comment) VALUES ($1, $2, $3, $4)",
+		"INSERT INTO user_visit (user_id, pointer_id, rating, comment, user_activity) VALUES ($1, $2, $3, $4, $5)",
 		visit.UserId,
 		visit.PointerId,
 		visit.Rating,
 		visit.Comment,
+		visit.Activity,
 	)
 	if err != nil {
 		return err
@@ -125,4 +126,75 @@ func (m *mapperRepository) GetUserVisitCount(ctx context.Context, id oid.ID) (ui
 		return 0, err
 	}
 	return count, nil
+}
+
+func (m *mapperRepository) GetCoins(ctx context.Context, id oid.ID) (uint, error) {
+	var coins uint
+	err := m.pool.QueryRow(
+		ctx,
+		"SELECT coin_count FROM user_coins WHERE user_id=$1",
+		id,
+	).Scan(&coins)
+	if err != nil {
+		return 0, err
+	}
+
+	return coins, nil
+}
+
+func (m *mapperRepository) UpdateCoins(ctx context.Context, id oid.ID, count int) error {
+	var countRow int
+	err := m.pool.QueryRow(
+		ctx,
+		"SELECT count(*) FROM user_coins WHERE user_id=$1",
+		id,
+	).Scan(&countRow)
+	if err != nil {
+		return err
+	}
+	if countRow == 0 {
+		_, err := m.pool.Exec(
+			ctx,
+			"INSERT INTO user_coins(user_id, coin_count) VALUES ($1, $2)",
+			id,
+			count,
+		)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	_, err = m.pool.Exec(
+		ctx,
+		"UPDATE user_coins SET coin_count=coin_count+$2 WHERE user_id = $1",
+		id,
+		count,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *mapperRepository) GetCommentsByPlace(ctx context.Context, point_id oid.ID) ([]*entity.Commit, error) {
+	rows, err := m.pool.Query(
+		ctx,
+		"Select user_id, comment FROM user_visit WHERE pointer_id=$1",
+		point_id,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	comments := make([]*entity.Commit, 0)
+	err = pgxscan.ScanAll(&comments, rows)
+	if err != nil {
+		return nil, err
+	}
+	return comments, nil
 }
